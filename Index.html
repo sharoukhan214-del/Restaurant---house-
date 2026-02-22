@@ -1,38 +1,89 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مطعم بيبو الفنان</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@700&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Cairo', sans-serif; background-color: #f4f4f4; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .order-card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); text-align: center; width: 90%; max-width: 400px; }
-        h1 { color: #ff4757; }
-        .btn-whatsapp { background-color: #25D366; color: white; padding: 15px 30px; border: none; border-radius: 50px; font-size: 1.2em; cursor: pointer; text-decoration: none; display: inline-block; margin-top: 20px; font-weight: bold; }
-    </style>
-</head>
-<body>
+import React, { useState } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ShoppingCart } from "lucide-react";
 
-    <div class="order-card">
-        <h1>🔥 مطعم بيبو</h1>
-        <p>جاهز لتنفيذ طلبك يا بطل؟</p>
-        <a href="javascript:void(0);" onclick="sendOrder()" class="btn-whatsapp">اطلب عبر واتساب</a>
+export default function MatamBeity() {
+  const [cart, setCart] = useState([]);
+  const [showCart, setShowCart] = useState(false);
+
+  const products = [
+    { id: 1, name: "وجبة فراخ مشوية", price: 120 },
+    { id: 2, name: "وجبة كفتة", price: 110 },
+    { id: 3, name: "وجبة مكرونة بشاميل", price: 95 },
+  ];
+
+  const addToCart = (product) => {
+    setCart([...cart, product]);
+  };
+
+  const totalPrice = cart.reduce((total, item) => total + item.price, 0);
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-4">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">مطعم بيتي - القاهرة</h1>
+        <Button
+          onClick={() => setShowCart(!showCart)}
+          className="rounded-2xl shadow-md"
+        >
+          <ShoppingCart className="ml-2" /> ({cart.length})
+        </Button>
+      </div>
+
+      {/* Products */}
+      <div className="grid md:grid-cols-3 gap-6">
+        {products.map((product) => (
+          <Card key={product.id} className="rounded-2xl shadow-lg">
+            <CardContent className="p-4 text-center">
+              <h2 className="text-xl font-semibold mb-2">
+                {product.name}
+              </h2>
+              <p className="text-lg mb-4">{product.price} جنيه</p>
+              <Button
+                onClick={() => addToCart(product)}
+                className="w-full rounded-xl"
+              >
+                أضف للسلة
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Cart Section */}
+      {showCart && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl p-6 rounded-t-2xl">
+          <h2 className="text-2xl font-bold mb-4">سلة المشتريات</h2>
+          {cart.length === 0 ? (
+            <p>السلة فارغة</p>
+          ) : (
+            <div>
+              {cart.map((item, index) => (
+                <div key={index} className="flex justify-between mb-2">
+                  <span>{item.name}</span>
+                  <span>{item.price} جنيه</span>
+                </div>
+              ))}
+              <hr className="my-3" />
+              <div className="flex justify-between font-bold text-lg">
+                <span>الإجمالي:</span>
+                <span>{totalPrice} جنيه</span>
+              </div>
+
+              <div className="mt-4 space-y-2">
+                <Button className="w-full rounded-xl">
+                  الدفع عند الاستلام
+                </Button>
+                <Button className="w-full rounded-xl">
+                  دفع أونلاين (فودافون كاش)
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
-
-    <script>
-        function sendOrder() {
-            // غير الرقم ده لرقمك الحقيقي (مثال: 201012345678)
-            var phone = "201012345678"; 
-            var text = encodeURIComponent("يا بيبو، أنا جاي من الموقع وعايز أعمل طلب أكل.");
-            
-            // استخدمنا الرابط ده لأنه الأضمن للموبايلات
-            var whatsappUrl = "https://api.whatsapp.com/send?phone=" + phone + "&text=" + text;
-            
-            // "فن حرب": بنحاول نفتح الرابط في نفس النافذة عشان نهرب من حماية التطبيقات
-            window.location.href = whatsappUrl;
-        }
-    </script>
-
-</body>
-</html>
+  );
+}
